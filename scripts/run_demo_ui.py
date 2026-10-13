@@ -275,8 +275,9 @@ message.className="error";return}submit.disabled=true;loader.classList.add("show
 message.className="";meta.textContent="Curating…";results.innerHTML="";
 try{const query=new URLSearchParams({user_id:userId,k:count,method:methodField.value});
 const response = await fetch(
-  `https://ai-powered-recommendation-system-8h2m.onrender.com/recommendations/${encodeURIComponent(userId)}?k=${encodeURIComponent(count)}&method=${encodeURIComponent(methodField.value)}`
-);const data=await response.json();
+  `/recommendations?user_id=${encodeURIComponent(userId)}&k=${encodeURIComponent(count)}&method=${encodeURIComponent(methodField.value)}`
+);
+const data = await response.json();
 if(!response.ok)throw new Error(data.error||"Unable to load recommendations.");
 const items=data.recommendations||[];meta.textContent=items.length+" movies · "+data.source.replaceAll("_"," ");
 if(!items.length){results.innerHTML='<div class="empty"><div>No eligible movies found for this user.</div></div>'}
