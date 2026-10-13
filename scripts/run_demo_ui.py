@@ -274,7 +274,9 @@ if(!userId||!count||Number(count)<1||Number(count)>100){message.textContent="Use
 message.className="error";return}submit.disabled=true;loader.classList.add("show");message.textContent="";
 message.className="";meta.textContent="Curating…";results.innerHTML="";
 try{const query=new URLSearchParams({user_id:userId,k:count,method:methodField.value});
-const response=await fetch("/recommendations?"+query);const data=await response.json();
+const response = await fetch(
+  `https://ai-powered-recommendation-system-8h2m.onrender.com/recommendations/${encodeURIComponent(userId)}?k=${encodeURIComponent(count)}&method=${encodeURIComponent(methodField.value)}`
+);const data=await response.json();
 if(!response.ok)throw new Error(data.error||"Unable to load recommendations.");
 const items=data.recommendations||[];meta.textContent=items.length+" movies · "+data.source.replaceAll("_"," ");
 if(!items.length){results.innerHTML='<div class="empty"><div>No eligible movies found for this user.</div></div>'}
@@ -344,8 +346,8 @@ finally{submit.disabled=false;loader.classList.remove("show")}};
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset-root", type=Path, default=Path("data") / "ml-25m")
-    parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8501)
+    parser.add_argument("--host", default="0.0.0.0")
+    parser.add_argument("--port", type=int, default=int(__import__("os").environ.get("PORT", "8501")))
     args = parser.parse_args()
     server = ThreadingHTTPServer(
         (args.host, args.port),
