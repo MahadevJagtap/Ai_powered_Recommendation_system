@@ -2,6 +2,7 @@
 # Core data pipeline and validation dependencies.
 numpy==2.1.3
 pandas==2.2.3
+certifi
 
 # Test runner.
 pytest==8.3.4
