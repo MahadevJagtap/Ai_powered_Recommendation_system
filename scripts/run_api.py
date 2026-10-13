@@ -1,7 +1,7 @@
 """Run the local dependency-free recommendation HTTP API."""
 
 from __future__ import annotations
-
+import os
 import argparse
 import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -76,15 +76,32 @@ def make_handler(service: RecommendationService) -> type[BaseHTTPRequestHandler]
     return Handler
 
 
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset-root", type=Path, default=Path("data") / "ml-25m")
-    parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8000)
+    parser.add_argument(
+        "--dataset-root",
+        type=Path,
+        default=Path(os.environ.get("DATASET_ROOT", "data/ml-25m")),
+    )
+    parser.add_argument(
+        "--host",
+        default=os.environ.get("HOST", "127.0.0.1"),
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=int(os.environ.get("PORT", "8000")),
+    )
+
     args = parser.parse_args()
     service = build_service(args.dataset_root)
-    server = ThreadingHTTPServer((args.host, args.port), make_handler(service))
+    server = ThreadingHTTPServer(
+        (args.host, args.port),
+        make_handler(service),
+    )
     print(f"Recommendation API listening on http://{args.host}:{args.port}")
+
     try:
         server.serve_forever()
     except KeyboardInterrupt:
