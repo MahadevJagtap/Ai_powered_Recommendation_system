@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local environments
+.venv/
+.venv-tf312/
+venv/
+env/
+
+# Generated outputs
+artifacts/
+cache/
+logs/
+results/
+*.parquet
+*.feather
+*.pkl
+*.pickle
+*.pt
+*.pth
+*.index
+*.h5
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Dataset files are supplied locally and must not be committed.
+data/
+
+# Editors and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
