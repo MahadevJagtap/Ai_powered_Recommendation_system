@@ -1,0 +1,19 @@
+{
+  "dataset": {
+    "root": "data\\ml-25m",
+    "ratings_rows": 25000095,
+    "movies_rows": 62423
+  },
+  "split": {
+    "train_rows": 20137973,
+    "validation_rows": 2431061,
+    "test_rows": 2431061
+  },
+  "positive_rating_threshold": 4.0,
+  "metrics": {
+    "users_evaluated": 150363,
+    "recall_at_10": 0.057301787940032926,
+    "recall_at_50": 0.17128205456798556,
+    "ndcg_at_10": 0.05086341849275487
+  }
+}
