@@ -29,22 +29,16 @@ def build_service(dataset_root: Path) -> RecommendationService:
 
 
 
+
 def make_handler(service: RecommendationService) -> type[BaseHTTPRequestHandler]:
     class Handler(BaseHTTPRequestHandler):
-
         def end_headers(self) -> None:
             self.send_header(
                 "Access-Control-Allow-Origin",
                 "https://recommendation-ui-65o5.onrender.com",
             )
-            self.send_header(
-                "Access-Control-Allow-Methods",
-                "GET, OPTIONS",
-            )
-            self.send_header(
-                "Access-Control-Allow-Headers",
-                "Content-Type",
-            )
+            self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type")
             super().end_headers()
 
         def do_OPTIONS(self) -> None:  # noqa: N802
@@ -59,9 +53,51 @@ def make_handler(service: RecommendationService) -> type[BaseHTTPRequestHandler]
             self.end_headers()
             self.wfile.write(body)
 
-        # Keep your existing do_GET() and log_message() methods unchanged.
+        def do_GET(self) -> None:  # noqa: N802
+            parsed = urlparse(self.path)
+
+            if parsed.path == "/health":
+                self._write(200, {"status": "ok"})
+                return
+
+            if parsed.path == "/ready":
+                self._write(
+                    200,
+                    {"status": "ready", "model_version": service.model_version},
+                )
+                return
+
+            prefix = "/recommendations/"
+            if parsed.path.startswith(prefix):
+                try:
+                    user_id = int(parsed.path[len(prefix):])
+                    query = parse_qs(parsed.query)
+                    k = int(query.get("k", ["10"])[0])
+                    method = query.get("method", ["retrieval"])[0]
+                    response = service.recommend(user_id, k=k, method=method)
+
+                    self._write(
+                        200,
+                        {
+                            "user_id": user_id,
+                            "method": method,
+                            "source": response.source,
+                            "model_version": response.model_version,
+                            "recommendations": response.recommendations,
+                            "explanations": response.explanations,
+                        },
+                    )
+                except (ValueError, RuntimeError, KeyError) as exc:
+                    self._write(400, {"error": str(exc)})
+                return
+
+            self._write(404, {"error": "not found"})
+
+        def log_message(self, format: str, *args: object) -> None:
+            return
 
     return Handler
+
 
 
 
